@@ -1,21 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./ZkAddressManager.sol"; // Import the ZkAddressManager contract
+import "forge-std/Script.sol";
+import "../src/ZkAddressManager.sol"; // Import the ZkAddressManager contract
 
-contract ZkAddressManagerDeployer {
-    // Event to notify when a new ZkAddressManager contract is deployed
-    event ZkAddressManagerDeployed(address indexed zkAddressManager);
+contract DeployZkAddressManager is Script {
+    function run() external {
+        // Start broadcasting the transaction
+        vm.startBroadcast();
 
-    // Function to deploy a new ZkAddressManager contract
-    function deployZkAddressManager(address _verifierContract) external returns (address) {
-        // Deploy the ZkAddressManager contract
-        ZkAddressManager zkAddressManager = new ZkAddressManager(_verifierContract);
-        
-        // Emit an event with the address of the deployed contract
-        emit ZkAddressManagerDeployed(address(zkAddressManager));
-        
-        // Return the address of the deployed contract
-        return address(zkAddressManager);
+        // Deploy the Verifier contract
+        Verifier verifier = new Verifier();
+
+        // Deploy the ZkAddressManager contract with the address of the Verifier
+        ZkAddressManager zkAddressManager = new ZkAddressManager(address(verifier));
+
+        // Stop broadcasting the transaction
+        vm.stopBroadcast();
+
+        // Log the addresses of the deployed contracts
+        console.log("Verifier deployed at:", address(verifier));
+        console.log("ZkAddressManager deployed at:", address(zkAddressManager));
     }
 }
